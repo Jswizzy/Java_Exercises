@@ -1,37 +1,40 @@
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
 
 class RaindropConverter {
 
-    private static final Collection<Object[]> FACTORS = Arrays.asList(new Object[][]{
-            {3, "Pling"},
-            {5, "Plang"},
-            {7, "Plong"},
-    });
     private StringBuilder raindropMessage;
+
+    private static final Map<Integer, String> raindrops;
+
+    static {
+        raindrops = new HashMap<>();
+        raindrops.put(3, "Pling");
+        raindrops.put(5, "Plang");
+        raindrops.put(7, "Plong");
+    }
 
     public RaindropConverter() {
         this.raindropMessage = new StringBuilder();
     }
 
-    String convert(int number) {
 
-        for (Object[] factor : FACTORS) {
-            if (isFactor(number, (int) factor[0])) {
-                raindropMessage.append(factor[1]);
-            }
-        }
+    public String convert(int inputNumber) {
 
-        if (isEmpty()) return String.valueOf(number);
-        else return raindropMessage.toString();
+        Predicate<Integer> isFactor = f -> inputNumber % f == 0;
+
+        Consumer<Integer> addRaindropMessage = f ->
+                raindropMessage.append(raindrops.get(f));
+
+        raindrops.keySet().stream()
+                .filter(isFactor)
+                .forEach(addRaindropMessage);
+        
+        return raindropMessage.length() == 0 ?
+                String.valueOf(inputNumber)
+                : raindropMessage.toString();
     }
-
-    private boolean isEmpty() {
-        return raindropMessage.toString().isEmpty();
-    }
-
-    private boolean isFactor(int number, int factor) {
-        return number % factor == 0;
-    }
-
 }
+
